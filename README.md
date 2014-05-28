@@ -1,4 +1,19 @@
 fastortho-to-fasta
 ==================
 
-Parse FastOrtho output, create fasta files for each ortholog containing all sequences
+This script parses FastOrtho output and creates fasta files containing all sequences for each ortholog
+
+FastOrtho output:
+```
+ORTHOMCL25 (14 genes,6 taxa):    cds.comp8678_c0_seq2|m.1387(Daxi_longest.fasta.transdecoder) cds.comp7262_c0_seq2|m.1956(Plob_longest.fasta.transdecoder) cds.comp73244_c0_seq1|m.24467(Tcoc_longest.fasta.transdecoder)
+```
+
+Parsed output ORTHOMCL25.fasta
+```
+>Daxi_comp8678_c0_seq2|m.1387
+AAACCAGCAAGTGCATTTCCAGAACTTGAAAATCTCAGTCTAGAAGAGCTCAAGCATCTTAATGATAAGCCTGAAGTTATGGATACTTTAGTAACAAAAGTAGATTCGGTTAAAAAAGTAGAAGCTGAAAAAGAAGAAGT
+>Plob_cds.comp7262_c0_seq2|m.1956
+AATCATAGATGTAAAAGGTCTGGCCATTTTGACTTCTTGTACCATGTATGTCCTAACATTACAGTCATGTTTTGTGTTTATCTTTTCAGAACCTTACCACCACAGTTTCCAAATGAAAGACCCCTTGTCAAGGTTGCTCC
+>Tcoc_cds.comp73244_c0_seq1|m.24467
+TTTCCAAGTGAGAGACCGATTGTGAAGGTGGCTCCACCCTTGGTACACCAATGGGTGAATGACCAGATGGTGGTTGTGGGCTGTCCTGCAATTAATAGTTTTTACATGCACTCTAATCTGGGTAGAGCCATTGTGGATGT
+```
