@@ -1,5 +1,7 @@
-fastortho-to-fasta
+Bioinformatics Scripts
 ==================
+
+###fastortho-to-fasta
 
 This script parses FastOrtho output and creates fasta files containing all sequences for each ortholog
 
