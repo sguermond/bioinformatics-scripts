@@ -4,7 +4,7 @@
 # from the .end output file of FastOrtho
 
 # Sarah Guermond
-# 27 May 2014
+# 18 June 2014
 
 import io
 import sys
@@ -13,23 +13,26 @@ import os
 from collections import defaultdict
 from Bio import SeqIO
 
-if len(sys.argv) < 4:
+if len(sys.argv) < 5:
 	print("\n\tThis script creates fasta files of protein or nucleotide sequences")
 	print("\tfrom the .end output file of FastOrtho.")
 	print("\n\tUsage: ./ortho_end_to_fasta.py <ortho.end> <in format> <list>")
 	print("\n\t<ortho.end>: FastOrtho .end file")
 	print("\t<in format>: file extension of FastOrtho input file (pep, fasta...)")
+	print("\t<num taxa>: minimum number of taxa  desired in ortholog")
 	print("\t<list>: tab-separated list of reference nuc/pep files, FastOrtho input file, and species prefix")
 	print("\t\tEx: \tDuncanopsammia_longest.cds\tDaxi.transdecoder.pep\tDaxi\n")
 	quit()
 
 orthologs = sys.argv[1]
 extension = sys.argv[2]
-info_file_list = sys.argv[3]
+min_taxa = sys.argv[3]
+info_file_list = sys.argv[4]
 
-## to do: automatically move new fasta files to new dir
+### to do: automatically move new fasta files to new dir
 # make new dir ortho_fasta to create fasta files in
 # os.makedirs("ortho_fasta")
+# change | to _ for Clustal processing
 
 # read list of species info
 #### reference	transdecoder	species
@@ -47,11 +50,20 @@ info_handle.close()
 ortho_handle = io.open(orthologs, "rb")
 species_seqname_to_ortho = {}
 for line in ortho_handle:
-	# get ortholog name
-	line_list = line.strip().split("\t")
-	ortho_header = line_list[0]
-	ortho_header_split = ortho_header.split(" ")
-	ortho = ortho_header_split[0]
+        # get number of taxa
+        line_list = line.strip().split("\t")
+        ortho_header = line_list[0]
+        ortho_header_split = ortho_header.split(" ")
+        gene_taxa = ortho_header_split[2]
+        num_taxa_result = re.subn("genes,", "", gene_taxa, 0)
+        num_taxa_split = num_taxa_result[0].strip().split(" ")
+        num_taxa = num_taxa_split[0]
+        # skip to next if too few taxa in ortholog
+        if num_taxa < min_taxa:
+                continue
+
+        # get ortholog name
+        ortho = ortho_header_split[0]
 
 	# get species filenames, seqs
 	seq_line = line_list[1].strip()
