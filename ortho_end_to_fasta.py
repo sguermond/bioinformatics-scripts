@@ -32,7 +32,7 @@ info_file_list = sys.argv[4]
 ### to do: automatically move new fasta files to new dir
 # make new dir ortho_fasta to create fasta files in
 # os.makedirs("ortho_fasta")
-# change | to _ for Clustal processing
+
 
 # read list of species info
 #### reference	transdecoder	species
@@ -94,6 +94,11 @@ for species in info_files:
 		species_seqname = species['species_prefix'] + "." + seqid
 		# find it in the dictionary, get associated ortholog
 		if species_seqname in species_seqname_to_ortho:
+			# change | in seqid to _
+            		seqid_result = re.subn("\|", "_", seqid_pipe, 0)
+            		seqid_split = seqid_result[0].strip().split(" ")
+            		seqid = seqid_split[0]
+			# get ortholog
 			ortho = species_seqname_to_ortho.get(species_seqname)
 			with open(ortho + '.fasta', 'a') as outfile:
 				outfile.write('>' + species['species_prefix'] + '_' + seqid + '\n' + seq + '\n')
