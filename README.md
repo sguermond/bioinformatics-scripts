@@ -23,8 +23,10 @@ TTTCCAAGTGAGAGACCGATTGTGAAGGTGGCTCCACCCTTGGTACACCAATGGGTGAATGACCAGATGGTGGTTGTGGG
 ###ortho_filtering.py
 
 This script searches FastOrtho output for orthologs matching the minimum required taxa from two user-defined lists
-Outputs a filtered .end file
+
 Ex. when seaching for orthologs matching two clades, or having at least one representative from each clade
+
+Outputs a filtered .end file
 
 Input:
 ```
