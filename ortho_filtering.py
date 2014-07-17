@@ -1,4 +1,4 @@
-  GNU nano 2.0.9                                                                                                                                                                                                      File: lab/Scripts/ortho_filtering.py                                                                                                                                                                                                                                                                                                                                                                                                                  
+  GNU nano 2.0.9                                                                                                                                                                                                File: /home/zoo/guermons/lab/Scripts/ortho_filtering.py                                                                                                                                                                                                                                                                                                                                                                                                       
 
 #!/usr/bin/env python2.7
 
@@ -48,14 +48,18 @@ def file_to_list(file):
 list1 = file_to_list(list1_file)
 list2 = file_to_list(list2_file)
 
+# creat filehandles 
 ortho_handle = io.open(orthologs, "rb")
 outfile_handle = io.open(output, "wb")
+seqnum_handle = io.open(output + "_seqnums", "wb")
 
 # make function dealing with none
-def none_list(inhandle, outhandle, list_none, list_num, min):
+def none_list(inhandle, outhandle, numhandle, list_none, list_num, min):
     match = 0
     nomatch = 0
+    numhandle.write("Ortholog\t" + "\t".join(list_num))
     for line in inhandle:
+        sp_dict = {} # keeps track of which species have been seen in this ortholog
         list_num_count = 0
         list_none_count = 0
         line_list = line.strip().split("\t")
@@ -66,23 +70,42 @@ def none_list(inhandle, outhandle, list_none, list_num, min):
             right = seq_sp.find(')')
             sp = seq_sp[left+1:right]
             if sp in list_num:
-                list_num_count += 1
+                # check if seen before
+                if sp in sp_dict:
+                    sp_dict[sp] += 1
+                else:
+                    sp_dict[sp] = 1
+                    list_num_count += 1
             elif sp in list_none:
                 list_none_count += 1
             else:
                 print "No species ", sp, " found in none list"
+        # check against requirements
         if list_num_count >= min and list_none_count == 0:
-            # print line to outfile
             outhandle.write(line)
+            # get ortholog name 
+            ortho_header = line_list[0]
+            ortho_header_split = ortho_header.split(" ")
+            ortho = ortho_header_split[0]
             match += 1
+            # print to seq num file
+            numhandle.write('\n' + ortho + '\t')
+            for species in list_num:
+                if species in sp_dict:
+                    numhandle.write((str(sp_dict[species]) + "\t").rstrip('\n'))
+                else:
+                    numhandle.write((str("0") + '\t').rstrip('\n'))
         else:
             nomatch += 1
     return(match, nomatch)
 
-def regular_list(inhandle, outhandle, list1, min1, list2, min2):
+# if no None
+def regular_list(inhandle, outhandle, numhandle, list1, min1, list2, min2):
     match = 0
     nomatch = 0
+    numhandle.write("Ortholog\t" + "\t".join(list1 + list2))
     for line in inhandle:
+        sp_dict = {} # keeps track of which species have been seen in this ortholog
         list1_count = 0
         list2_count = 0
         line_list = line.strip().split("\t")
@@ -94,14 +117,33 @@ def regular_list(inhandle, outhandle, list1, min1, list2, min2):
             right = seq_sp.find(')')
             sp = seq_sp[left+1:right]
             if sp in list1:
-                list1_count += 1
+                if sp in sp_dict:
+                    sp_dict[sp] += 1
+                else:
+                    sp_dict[sp] = 1
+                    list1_count += 1
             elif sp in list2:
-                list2_count += 1
+                if sp in sp_dict:
+                    sp_dict[sp] += 1
+                else:
+                    sp_dict[sp] = 1
+                    list2_count += 1
             else:
                 print "No species ", sp, " found in list 1 or 2"
         if list1_count >= min1 and list2_count >= min2:
-        # print line to outfile
+            # print line to outfile
             outhandle.write(line)
+            # get ortholog name 
+            ortho_header = line_list[0]
+            ortho_header_split = ortho_header.split(" ")
+            ortho = ortho_header_split[0]
+            # print to seq num file
+            numhandle.write('\n' + ortho + '\t')
+            for species in list1 + list2:
+                if species in sp_dict:
+                    numhandle.write((str(sp_dict[species]) + "\t").rstrip('\n'))
+                else:
+                    numhandle.write((str("0") + '\t').rstrip('\n'))
             match += 1
         else:
             nomatch += 1
@@ -110,20 +152,22 @@ def regular_list(inhandle, outhandle, list1, min1, list2, min2):
 # establish number needed for list
 if min1 == "None" and min2 != "None":
     num2 = int(min2)
-    match, nomatch = none_list(ortho_handle, outfile_handle, list1, list2, num2)
+    match, nomatch = none_list(ortho_handle, outfile_handle, seqnum_handle, list1, list2, num2)
 elif min2 == "None" and min1 != "None":
     num1 = int(min1)
-    match, nomatch = none_list(ortho_handle, outfile_handle, list2, list1, num1)
+    match, nomatch = none_list(ortho_handle, outfile_handle, seqnum_handle, list2, list1, num1)
 elif min1 == min2 == "None":
     print "Error: you asked for none from both lists"
     quit()
 else:
     num1 = int(min1)
     num2 = int(min2)
-    match, nomatch = regular_list(ortho_handle, outfile_handle, list1, num1, list2, num2)
+    match, nomatch = regular_list(ortho_handle, outfile_handle, seqnum_handle, list1, num1, list2, num2)
 
 print match, " matches found"
 print nomatch, " had no matches"
 
 ortho_handle.close()
 outfile_handle.close()
+
+
