@@ -26,7 +26,7 @@ This script searches FastOrtho output for orthologs matching the minimum require
 
 Ex. when seaching for orthologs matching two clades, or having at least one representative from each clade
 
-Outputs a filtered .end file
+Outputs a filtered .end file and a tab-delimited file of the number of sequences per species in each ortholog
 
 Input:
 ```
